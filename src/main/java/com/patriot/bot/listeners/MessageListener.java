@@ -24,7 +24,8 @@ public class MessageListener implements MessageCreateListener {
     private Locale locale = new Locale("ru-RU");
     @Override
     public void onMessageCreate(MessageCreateEvent event) {
-        if (event.getMessageContent().equalsIgnoreCase("слава украине")) {
+        if (event.getMessageContent().toLowerCase(locale).equals("слава украине")||
+        event.getMessageContent().toLowerCase(locale).equals("славаукраине")) {
             try {
                 event.getMessage().reply(new EmbedBuilder()
                         .setTitle("Обнаружен хохол! Групповая эвакуация из беседы")
