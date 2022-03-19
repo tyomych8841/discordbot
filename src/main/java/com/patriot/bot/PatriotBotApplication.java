@@ -1,5 +1,6 @@
 package com.patriot.bot;
 
+import com.patriot.bot.listeners.ConfigListener;
 import com.patriot.bot.listeners.KickListener;
 import com.patriot.bot.listeners.MessageListener;
 import com.patriot.bot.listeners.UnbanListener;
@@ -44,6 +45,7 @@ public class PatriotBotApplication {
 		api.addListener(new MessageListener());
 		api.addListener(new UnbanListener());
 		api.addListener(new KickListener());
+		api.addListener(new ConfigListener());
 		return api;
 	}
 

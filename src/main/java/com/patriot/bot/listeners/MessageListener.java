@@ -1,16 +1,11 @@
 package com.patriot.bot.listeners;
-
-import com.patriot.bot.PatriotBotApplication;
 import com.vdurmont.emoji.EmojiParser;
-import org.javacord.api.DiscordApi;
-import org.javacord.api.entity.emoji.Emoji;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
-import org.javacord.api.entity.message.mention.AllowedMentionsBuilder;
+import org.javacord.api.entity.permission.Role;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.event.message.MessageCreateEvent;
 import org.javacord.api.listener.message.MessageCreateListener;
-
 import java.awt.*;
 import java.util.List;
 import java.util.Locale;
@@ -20,24 +15,39 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class MessageListener implements MessageCreateListener {
-    private final PatriotBotApplication checkUser = new PatriotBotApplication();
-    private Locale locale = new Locale("ru-RU");
+    private final Locale locale = new Locale("ru-RU");
+    private ConfigListener cl = new ConfigListener();
     @Override
     public void onMessageCreate(MessageCreateEvent event) {
-        if (event.getMessageContent().toLowerCase(locale).equals("слава украине")||
-        event.getMessageContent().toLowerCase(locale).equals("славаукраине")) {
-            try {
-                event.getMessage().reply(new EmbedBuilder()
+        if (event.getMessageContent().toLowerCase(locale).contains("слава украине")||
+            event.getMessageContent().toLowerCase(locale).contains("славаукраине")||
+                event.getMessageContent().toLowerCase(locale).contains("украине слава")||
+                event.getMessageContent().toLowerCase(locale).contains("украинеслава")||
+                event.getMessageContent().toLowerCase(locale).contains("москаль")||
+                event.getMessageContent().toLowerCase(locale).contains("кацап")||
+                event.getMessageContent().toLowerCase(locale).contains("ватник")||
+                event.getMessageContent().toLowerCase(locale).contains("путин хуйло")||
+                event.getMessageContent().toLowerCase(locale).contains("москали")||
+                event.getMessageContent().toLowerCase(locale).contains("кацапы")||
+                event.getMessageContent().toLowerCase(locale).contains("ватники")
+        ) {
+                event.getMessage().reply( new EmbedBuilder()
                         .setTitle("Обнаружен хохол! Групповая эвакуация из беседы")
-                        .setDescription(event.getMessageAuthor().asUser().get().getMentionTag()+" ,Сало украине")
+                        .setDescription("Имя хохла - "+event.getMessageAuthor().asUser().get().getMentionTag())
                         .setThumbnail("https://thumbs.dreamstime.com/b/%D0%BA%D1%80%D0%B8%D0%B7%D0%B8%D1%81-%D1%83%D0%BA%D1%80%D0%B0%D0%B8%D0%BD%D1%81%D0%BA%D0%BE%D0%B9-%D1%8D%D0%BA%D0%BE%D0%BD%D0%BE%D0%BC%D0%B8%D0%BA%D0%B8-%D0%BA%D0%BE%D0%BD%D1%86%D0%B5%D0%BF%D1%86%D0%B8%D1%8F-74258390.jpg")
-                        .setColor(Color.yellow)
-                );
-                TimeUnit.MILLISECONDS.sleep(500);
-                event.getMessage().delete();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+                        .setColor(Color.yellow));
+                List<Role> roles = event.getMessageAuthor().asUser().get().getRoles(event.getServer().get());
+            for (Role role :
+                    roles) {
+                event.getMessageAuthor().asUser().get().removeRole(role);
             }
+                event.getMessageAuthor().asUser().get().addRole(cl.getXoxolRole(event));
+                try {
+                    TimeUnit.MILLISECONDS.sleep(500);
+                    event.getMessage().delete();
+                }catch (InterruptedException e){
+                    e.printStackTrace();
+                }
         }
         if (event.getMessageContent().startsWith("патриот забань")) {
             if (event.getMessageAuthor().isServerAdmin()) {
