@@ -13,6 +13,7 @@ import org.javacord.api.listener.message.MessageCreateListener;
 
 import java.awt.*;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
@@ -20,6 +21,7 @@ import java.util.regex.Pattern;
 
 public class MessageListener implements MessageCreateListener {
     private final PatriotBotApplication checkUser = new PatriotBotApplication();
+    private Locale locale = new Locale("ru-RU");
     @Override
     public void onMessageCreate(MessageCreateEvent event) {
         if (event.getMessageContent().equalsIgnoreCase("слава украине")) {
