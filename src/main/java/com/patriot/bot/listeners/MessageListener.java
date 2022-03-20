@@ -36,12 +36,17 @@ public class MessageListener implements MessageCreateListener {
                         .setDescription("Имя хохла - "+event.getMessageAuthor().asUser().get().getMentionTag())
                         .setThumbnail("https://thumbs.dreamstime.com/b/%D0%BA%D1%80%D0%B8%D0%B7%D0%B8%D1%81-%D1%83%D0%BA%D1%80%D0%B0%D0%B8%D0%BD%D1%81%D0%BA%D0%BE%D0%B9-%D1%8D%D0%BA%D0%BE%D0%BD%D0%BE%D0%BC%D0%B8%D0%BA%D0%B8-%D0%BA%D0%BE%D0%BD%D1%86%D0%B5%D0%BF%D1%86%D0%B8%D1%8F-74258390.jpg")
                         .setColor(Color.yellow));
-                List<Role> roles = event.getMessageAuthor().asUser().get().getRoles(event.getServer().get());
-            for (Role role :
-                    roles) {
-                event.getMessageAuthor().asUser().get().removeRole(role);
-            }
-                event.getMessageAuthor().asUser().get().addRole(cl.getXoxolRole(event));
+                if(cl.getXoxolRole(event)!=null) {
+                    List<Role> roles = event.getMessageAuthor().asUser().get().getRoles(event.getServer().get());
+                    for (Role role :
+                            roles) {
+                        event.getMessageAuthor().asUser().get().removeRole(role);
+                    }
+                    event.getMessageAuthor().asUser().get().addRole(cl.getXoxolRole(event));
+                } else {
+                    event.getServer().get().getOwner().get().getPrivateChannel().get().sendMessage("Не установлена роль хохла.\nДля установки, напишите:\n" +
+                            "**патриот роль хохла @роль**\n**патриот роль хохла 123456789123456**");
+                }
                 try {
                     TimeUnit.MILLISECONDS.sleep(500);
                     event.getMessage().delete();

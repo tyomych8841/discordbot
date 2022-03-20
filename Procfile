@@ -1,3 +1,1 @@
-worker: mvn spring-boot:run -Dspring-boot.run.jvmArguments=$JAVA_OPTS
-
-
+worker: java $JAVA_OPTS -jar target/bot-0.0.1-SNAPSHOT.jar

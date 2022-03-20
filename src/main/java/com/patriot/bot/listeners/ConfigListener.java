@@ -27,6 +27,8 @@ public class ConfigListener implements MessageCreateListener {
         if(event.getMessageContent().startsWith("патриот роль хохла")){
             Pattern p = Pattern.compile("патриот роль хохла([\\s\\d*]*)");
             Matcher m = p.matcher(event.getMessageContent());
+            Pattern pp = Pattern.compile("патриот роль хохла-([\\s\\d*]*)");
+            Matcher mm = pp.matcher(event.getMessageContent());
             List<Role> roles = event.getMessage().getMentionedRoles();
             if(!roles.isEmpty()){
                 if(roles.size()==1){
@@ -115,6 +117,64 @@ public class ConfigListener implements MessageCreateListener {
                         }catch (InterruptedException e){e.printStackTrace();}
                     }catch (InterruptedException|ExecutionException e){e.printStackTrace();}
                 }
+            } else if (mm.matches()){
+                String[] roleIds = event.getMessageContent().substring(mm.start(1), mm.end(1)).split("\\s");
+                EmbedBuilder emb = new EmbedBuilder().setTitle("Роль хохла").setColor(Color.green).setDescription("Успешно удалена роль хохла");
+                if (roleIds.length==1){
+                    if (!roleIds[1].isEmpty()){
+                        if(getXoxolRole(event)!=null) {
+                            event.getMessage().addReaction(EmojiParser.parseToUnicode(":white_check_mark:"));
+                            try {
+                                Message msg = event.getChannel().sendMessage(emb).get();
+                                try {
+                                    TimeUnit.SECONDS.sleep(5);
+                                    msg.delete();
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
+                            } catch (InterruptedException | ExecutionException e) {
+                                e.printStackTrace();
+                            }
+                        }else {
+                            event.getMessage().addReaction(EmojiParser.parseToUnicode(":x:"));
+                            try {
+                                Message msg = event.getChannel().sendMessage(emb.setTitle("Ошибка").setDescription("Роли хохла не существует").setColor(Color.red)).get();
+                                try {
+                                    TimeUnit.SECONDS.sleep(5);
+                                    msg.delete();
+                                }catch (InterruptedException e){e.printStackTrace();}
+                            } catch (InterruptedException|ExecutionException e){e.printStackTrace();}
+                        }
+                    }else{
+                        event.getMessage().addReaction(EmojiParser.parseToUnicode(":x:"));
+                        try {
+                            Message msg = event.getChannel().sendMessage(emb.setTitle("Ошибка")
+                                            .setDescription("Неверный синтаксис")
+                                            .addField("Примеры:",
+                                                    "патриот роль хохла- @рольХохла\n" +
+                                                            "патриот роль хохла- 123456789123456")
+                                            .setColor(Color.red)
+                                    ).get();
+                            try {
+                                TimeUnit.SECONDS.sleep(5);
+                                msg.delete();
+                            }catch (InterruptedException e){e.printStackTrace();}
+                        }catch (InterruptedException|ExecutionException e){e.printStackTrace();}
+                    }
+                }else{
+                    event.getMessage().addReaction(EmojiParser.parseToUnicode(":x:"));
+                    try {
+                        Message msg = event.getChannel().sendMessage(emb
+                                .setColor(Color.red)
+                                .setTitle("Ошибка")
+                                .setDescription("Может быть только 1-а роль")
+                        ).get();
+                        try {
+                            TimeUnit.SECONDS.sleep(5);
+                            msg.delete();
+                        }catch (InterruptedException e){e.printStackTrace();}
+                    }catch (InterruptedException|ExecutionException e){e.printStackTrace();}
+                }
             }
         }
     }
@@ -127,9 +187,7 @@ public class ConfigListener implements MessageCreateListener {
             props.setProperty(event.getServer().get().getIdAsString(), role.getIdAsString());
             System.out.println(event.getServer().get().getIdAsString()+role.getIdAsString());
             props.store(fw, null);
-        }catch (IOException e){e.printStackTrace();} catch (URISyntaxException e) {
-            e.printStackTrace();
-        }
+        }catch (IOException | URISyntaxException e){e.printStackTrace();}
     }
     public Role getXoxolRole (MessageCreateEvent event){
         Role role = null;
@@ -143,5 +201,20 @@ public class ConfigListener implements MessageCreateListener {
             e.printStackTrace();
         }
         return role;
+    }
+    public void deleteXoxolRole (MessageCreateEvent event){
+        if(getXoxolRole(event)!=null){
+            InputStream is = getClass().getResourceAsStream("/config");
+            Properties props = new Properties();
+            try {
+                props.load(is);
+                props.remove(event.getServer().get().getIdAsString());
+                FileWriter fw = new FileWriter(new File(getClass().getResource("/config").toURI()));
+                props.store(fw, null);
+            } catch (IOException | URISyntaxException e) {
+                e.printStackTrace();
+            }
+
+        }
     }
 }
